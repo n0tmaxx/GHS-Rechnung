@@ -230,9 +230,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 .badge-open { background: var(--status-open); color: #fff; }
-.badge-paid { background: linear-gradient(to right, var(--status-paid-start), var(--status-paid-end)); color: #fff; }
-.badge-overdue { background: var(--status-overdue); color: #fff; }
-.badge-cancelled { background: var(--status-cancelled); color: #fff; }
+.badge-paid { background: linear-gradient(to right, #1A7A4A, #2ECC71); color: #fff; }
+.badge-overdue { background: #F39C12; color: #fff; }
+.badge-storniert { background: #555577; color: #fff; }
 
 /* Table Styles */
 table {
@@ -255,11 +255,16 @@ td {
 }
 
 tr.paid {
-    background: linear-gradient(90deg, var(--status-paid-start) 0%, var(--status-paid-end) 100%);
+    background: linear-gradient(90deg, #1A7A4A 0%, #2ECC71 100%) !important;
 }
 
 tr.paid td {
     color: #fff !important;
+}
+
+tr.storniert td {
+    color: #555577 !important;
+    text-decoration: line-through;
 }
 
 /* Utilities */

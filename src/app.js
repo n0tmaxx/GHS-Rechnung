@@ -68,12 +68,24 @@ class App {
         }
     }
 
-    handleAction(action, id) {
-        switch(action) {
-            case 'edit-invoice': window.location.hash = `rechnung-edit/${id}`; break;
-            case 'mark-paid': this.markAsPaid(id); break;
-            case 'delete-invoice': this.deleteInvoice(id); break;
-        }
+    calculateDueDate(days) {
+        const dateInput = document.querySelector('[name="datum"]');
+        const targetInput = document.querySelector('[name="faelligkeitsdatum"]');
+        if (!dateInput || !targetInput) return;
+
+        const date = new Date(dateInput.value);
+        date.setDate(date.getDate() + parseInt(days));
+        targetInput.value = date.toISOString().split('T')[0];
+        this.updatePreview();
+    }
+
+    selectCustomer(id) {
+        const customer = store.getCustomerById(id);
+        if (!customer) return;
+        
+        document.getElementById('preview-customer-name').innerText = customer.firma;
+        document.getElementById('preview-customer-address').innerText = `${customer.strasse}, ${customer.plz} ${customer.ort}`;
+        this.updatePreview();
     }
 
     // --- Invoice Form Logic ---
@@ -109,12 +121,14 @@ class App {
         const descValue = data ? data.bezeichnung : '';
         const mengeValue = data ? data.menge : (type === 'artikel' ? 1 : 0);
         const preisValue = data ? data.einzelpreis : 0;
+        const einheitValue = data ? data.einheit : (type === 'artikel' ? 'Stk' : '');
 
         if (type === 'artikel') {
             tr.innerHTML = `
                 <td><i class="fa-solid fa-box" style="color: var(--accent);"></i></td>
                 <td><input type="number" name="menge" value="${mengeValue}" step="0.01"></td>
                 <td><input type="text" name="bezeichnung" value="${descValue}" placeholder="Leistungsbeschreibung..."></td>
+                <td><input type="text" name="einheit" value="${einheitValue}" placeholder="Einh." style="width: 50px;"></td>
                 <td><input type="number" name="einzelpreis" value="${preisValue}" step="0.01"></td>
                 <td class="text-right">
                     <button type="button" class="btn-icon" onclick="app.removeRow('${rowId}')"><i class="fa-solid fa-trash"></i></button>
@@ -159,11 +173,15 @@ class App {
         previewBody.innerHTML = '';
         let totalNetto = 0;
 
+        const customerId = formData.get('kunden_id');
+        this.selectCustomer(customerId); // Update preview customer display
+
         const rows = document.getElementById('items-body').querySelectorAll('tr');
         rows.forEach((row, index) => {
             const type = row.dataset.type;
             const menge = parseFloat(row.querySelector('[name="menge"]').value || 0);
             const desc = row.querySelector('[name="bezeichnung"]').value || '';
+            const einheit = row.querySelector('[name="einheit"]')?.value || '';
             const preis = parseFloat(row.querySelector('[name="einzelpreis"]').value || 0);
             const lineTotal = menge * preis;
 
@@ -172,7 +190,7 @@ class App {
                 previewBody.innerHTML += `
                     <tr style="border-bottom: 1px solid #f9f9f9;">
                         <td style="padding: 8px 0;">${index + 1}</td>
-                        <td style="padding: 8px 0;">${menge.toFixed(2)} Stk</td>
+                        <td style="padding: 8px 0;">${menge.toFixed(2)} ${einheit}</td>
                         <td style="padding: 8px 0;"><strong>${desc}</strong></td>
                         <td style="padding: 8px 0; text-align: right;">${this.formatCurrency(preis)}</td>
                         <td style="padding: 8px 0; text-align: right;">${this.formatCurrency(lineTotal)}</td>
@@ -222,10 +240,13 @@ class App {
             id,
             rechnungsnummer: formData.get('rechnungsnummer'),
             datum: formData.get('datum'),
+            lieferdatum: formData.get('lieferdatum'),
             faelligkeitsdatum: formData.get('faelligkeitsdatum'),
+            zahlungsziel_tage: parseInt(formData.get('zahlungsziel_tage')),
             kunden_id: formData.get('kunden_id'),
+            wartungstyp: formData.get('wartungstyp'),
             mwst_satz: mwstSatz,
-            status: 'offen',
+            status: formData.get('status'),
             gesamtbrutto: brutto,
             items
         };
@@ -264,12 +285,21 @@ class App {
             company_name: formData.get('company_name'),
             address: formData.get('address'),
             email: formData.get('email'),
-            bank: formData.get('bank'),
+            ust_id: formData.get('ust_id'),
+            steuernummer: formData.get('steuernummer'),
+            finanzamt: formData.get('finanzamt'),
+            laenderschlüssel: formData.get('laenderschlüssel'),
+            bank_name: formData.get('bank_name'),
+            kontoinhaber: formData.get('kontoinhaber'),
             iban: formData.get('iban'),
-            mwst_satz: parseFloat(formData.get('mwst_satz'))
+            bic: formData.get('bic'),
+            mwst_satz: 19, // Keep at 19 as default
+            pflichtenhinweis: formData.get('pflichtenhinweis'),
+            freistellungstext: formData.get('freistellungstext'),
+            zahlungszusatz: formData.get('zahlungszusatz')
         };
         store.saveSettings(settings);
-        alert('Einstellungen gespeichert!');
+        alert('Konfiguration gespeichert!');
     }
 
     resetData() {

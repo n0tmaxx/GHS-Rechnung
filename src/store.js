@@ -10,12 +10,22 @@ const STORAGE_KEYS = {
 };
 
 const DEFAULT_SETTINGS = {
-    company_name: 'GHS Heizung',
-    address: 'Musterstraße 123, 12345 Musterstadt',
+    company_name: 'GHS Heizung & Sanitär',
+    address: 'Pfannenstiel 1, 82386 Huglfing',
     email: 'info@ghs-heizung.de',
+    ust_id: 'DE310495725',
+    steuernummer: '168 222 50223',
+    finanzamt: 'München 1',
+    laenderschlüssel: '9',
     mwst_satz: 19,
-    bank: 'Sparkasse Musterstadt',
-    iban: 'DE12 3456 7890 0000 0000 00'
+    zahlungsziel_standard: 14,
+    bank_name: 'VR-Bank Starnberg-Zugspitze',
+    iban: 'DE12 3456 7890 0000 0000 00',
+    bic: 'GENODEF1MUN',
+    kontoinhaber: 'Martin Grimm',
+    pflichtenhinweis: 'Aufbewahrungspflicht gemäß §14b UStG (10 Jahre)',
+    freistellungstext: 'Ein gültiger Freistellungsbescheid zum Steuerabzug bei Bauleistungen liegt vor.',
+    zahlungszusatz: 'Achtung! Neue Bankverbindung!'
 };
 
 const INITIAL_DATA = {
@@ -25,12 +35,16 @@ const INITIAL_DATA = {
             rechnungsnummer: '2024-001',
             kunden_id: '1',
             datum: '2024-03-01',
+            lieferdatum: '2024-03-01',
             faelligkeitsdatum: '2024-03-15',
+            zahlungsziel_tage: 14,
             status: 'offen',
+            wartungstyp: 'Heizungswartung Öl',
             gesamtbrutto: 450.50,
+            mwst_satz: 19,
             items: [
-                { id: 'item1', menge: 2, bezeichnung: 'Wartung Brennwerttherme', einzelpreis: 150, typ: 'artikel' },
-                { id: 'item2', menge: 1, bezeichnung: 'Anfahrtspauschale', einzelpreis: 25, typ: 'artikel' }
+                { id: 'item1', menge: 2, bezeichnung: 'Wartung Brennwerttherme inkl. Düse & Ölfilter', einzelpreis: 150, einheit: 'Stk', typ: 'artikel' },
+                { id: 'item2', menge: 1, bezeichnung: 'KFZ-Pauschale & Anfahrt', einzelpreis: 45, einheit: 'Stk', typ: 'artikel' }
             ]
         },
         {
@@ -38,15 +52,21 @@ const INITIAL_DATA = {
             rechnungsnummer: '2024-002',
             kunden_id: '2',
             datum: '2024-03-10',
+            lieferdatum: '2024-03-10',
             faelligkeitsdatum: '2024-03-24',
+            zahlungsziel_tage: 14,
             status: 'bezahlt',
+            wartungstyp: 'Notdienst Rohrreinigung',
             gesamtbrutto: 1250.00,
-            items: []
+            mwst_satz: 19,
+            items: [
+                { id: 'item3', menge: 10, bezeichnung: 'Arbeitszeit Fachmonteur', einzelpreis: 85, einheit: 'Std', typ: 'artikel' }
+            ]
         }
     ],
     customers: [
-        { id: '1', firma: 'Max Mustermann', adresse: 'Musterweg 1, 12345 Stadt' },
-        { id: '2', firma: 'Bau GmbH', adresse: 'Industrieallee 5, 54321 Dorf' }
+        { id: '1', firma: 'Max Mustermann', ansprechpartner: 'Herr Mustermann', strasse: 'Musterweg 1', plz: '12345', ort: 'Musterstadt', email: 'max@mustermann.de', telefon: '0170 12345678', notizen: '' },
+        { id: '2', firma: 'Bau GmbH', ansprechpartner: 'Thomas Bauer', strasse: 'Industrieallee 5', plz: '54321', ort: 'Dorfingen', email: 'service@baugmbh.de', telefon: '089 54321', notizen: 'Rechnung immer per Mail' }
     ]
 };
 

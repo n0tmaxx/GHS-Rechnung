@@ -233,26 +233,52 @@ export const pages = {
                     <form id="invoice-form">
                         <section class="card">
                             <h2 class="mb-4" style="font-size: 16px;">Kopfdaten</h2>
-                            <div class="flex" style="gap: 16px;">
-                                <div class="form-group" style="flex: 1;">
-                                    <label>Rechnungsnummer</label>
+                            <div class="flex" style="gap: 16px; flex-wrap: wrap;">
+                                <div class="form-group" style="flex: 1; min-width: 150px;">
+                                    <label>Rechnungsnummer (JJJJ-NNN)</label>
                                     <input type="text" name="rechnungsnummer" value="${invoice.rechnungsnummer}">
                                 </div>
-                                <div class="form-group" style="flex: 1;">
-                                    <label>Datum</label>
+                                <div class="form-group" style="flex: 1; min-width: 120px;">
+                                    <label>Rechnungsdatum</label>
                                     <input type="date" name="datum" value="${invoice.datum}">
                                 </div>
-                                <div class="form-group" style="flex: 1;">
+                                <div class="form-group" style="flex: 1; min-width: 120px;">
+                                    <label>Liefer-/Leistungsdatum</label>
+                                    <input type="date" name="lieferdatum" value="${invoice.lieferdatum || invoice.datum}">
+                                </div>
+                            </div>
+                            <div class="flex" style="gap: 16px; flex-wrap: wrap;">
+                                <div class="form-group" style="flex: 1; min-width: 150px;">
+                                    <label>Zahlungsziel</label>
+                                    <select name="zahlungsziel_tage" onchange="app.calculateDueDate(this.value)">
+                                        <option value="7" ${invoice.zahlungsziel_tage == 7 ? 'selected' : ''}>7 Tage</option>
+                                        <option value="14" ${invoice.zahlungsziel_tage == 14 ? 'selected' : ''}>14 Tage</option>
+                                        <option value="30" ${invoice.zahlungsziel_tage == 30 ? 'selected' : ''}>30 Tage</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex: 1; min-width: 150px;">
                                     <label>Fälligkeitsdatum</label>
                                     <input type="date" name="faelligkeitsdatum" value="${invoice.faelligkeitsdatum}">
                                 </div>
+                                <div class="form-group" style="flex: 1; min-width: 150px;">
+                                    <label>Status</label>
+                                    <select name="status">
+                                        <option value="offen" ${invoice.status == 'offen' ? 'selected' : ''}>Offen</option>
+                                        <option value="bezahlt" ${invoice.status == 'bezahlt' ? 'selected' : ''}>Bezahlt</option>
+                                        <option value="storniert" ${invoice.status == 'storniert' ? 'selected' : ''}>Storniert</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Kunde</label>
-                                <select name="kunden_id">
+                                <label>Kunde (Stammkunde wählen)</label>
+                                <select name="kunden_id" onchange="app.selectCustomer(this.value)">
                                     <option value="">-- Kunden wählen --</option>
                                     ${customers.map(c => `<option value="${c.id}" ${c.id == invoice.kunden_id ? 'selected' : ''}>${c.firma}</option>`).join('')}
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Wartungstyp / Betreff (z.B. Heizungswartung Ölfeuerungsanlage)</label>
+                                <input type="text" name="wartungstyp" value="${invoice.wartungstyp || ''}" placeholder="Freitext für Betreffzeile...">
                             </div>
                         </section>
 
@@ -341,7 +367,7 @@ export const pages = {
                             </tbody>
                         </table>
 
-                        <div style="float: right; width: 40%; border-top: 1px solid #000; padding-top: 10px;">
+                        <div style="float: right; width: 45%; border-top: 1px solid #000; padding-top: 10px;">
                             <div class="flex justify-between" style="margin-bottom: 5px;">
                                 <span>Netto Gesamt</span>
                                 <span id="preview-netto">0,00 €</span>
@@ -356,9 +382,27 @@ export const pages = {
                             </div>
                         </div>
                         
-                        <div style="clear: both; margin-top: 50px; font-size: 9px; line-height: 1.4; border-top: 1px solid #eee; padding-top: 20px;">
-                            <p>Bitte überweisen Sie den Betrag innerhalb von 14 Tagen unter Angabe der Rechnungsnummer auf das unten genannte Konto.</p>
-                            <p style="margin-top: 10px;"><strong>IBAN:</strong> ${settings.iban} • <strong>Bank:</strong> ${settings.bank}</p>
+                        <div style="clear: both; margin-top: 50px; font-size: 9px; line-height: 1.6; border-top: 1px solid #eee; padding-top: 20px;">
+                            <p style="font-weight: 700; margin-bottom: 10px;">${settings.zahlungszusatz}</p>
+                            <p>Bitte überweisen Sie den Rechnungsbetrag innerhalb von ${invoice.zahlungsziel_tage || 14} Tagen unter Angabe der Rechnungsnummer auf das unten genannte Konto.</p>
+                            
+                            <div class="flex" style="margin-top: 15px; border-top: 1px dashed #eee; padding-top: 10px; gap: 30px;">
+                                <div style="flex: 1;">
+                                    <strong>Steuerdaten:</strong><br>
+                                    Länderschlüssel: ${settings.laenderschlüssel}<br>
+                                    Finanzamt: ${settings.finanzamt}<br>
+                                    Steuernummber: ${settings.steuernummer}<br>
+                                    USt-IdNr.: ${settings.ust_id}
+                                </div>
+                                <div style="flex: 1;">
+                                    <strong>Bankverbindung:</strong><br>
+                                    ${settings.bank_name}<br>
+                                    Inhaber: ${settings.kontoinhaber}<br>
+                                    IBAN: ${settings.iban}<br>
+                                    BIC: ${settings.bic}
+                                </div>
+                            </div>
+                            <p style="margin-top: 15px; font-style: italic; font-size: 8px;">${settings.pflichtenhinweis} • ${settings.freistellungstext}</p>
                         </div>
                     </div>
                 </div>
@@ -372,34 +416,86 @@ export const pages = {
             <div id="page-header">
                 <h1>Einstellungen</h1>
             </div>
-            <div class="card" style="max-width: 600px;">
+            <div class="card" style="max-width: 800px;">
                 <form id="settings-form" onsubmit="app.saveSettings(event)">
-                    <div class="form-group">
-                        <label>Firmenname</label>
-                        <input type="text" name="company_name" value="${settings.company_name}">
+                    <h3 class="mb-4" style="font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">Firmendaten</h3>
+                    <div class="flex" style="gap: 16px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Firmenname</label>
+                            <input type="text" name="company_name" value="${settings.company_name}">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Email</label>
+                            <input type="email" name="email" value="${settings.email}">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Adresse</label>
-                        <textarea name="address" rows="3">${settings.address}</textarea>
+                        <label>Vollständige Adresse</label>
+                        <textarea name="address" rows="2">${settings.address}</textarea>
+                    </div>
+
+                    <h3 class="mb-4 mt-4" style="font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">Rechtliches & Steuern</h3>
+                    <div class="flex" style="gap: 16px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>USt-IdNr.</label>
+                            <input type="text" name="ust_id" value="${settings.ust_id}">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Steuernummer</label>
+                            <input type="text" name="steuernummer" value="${settings.steuernummer}">
+                        </div>
+                    </div>
+                    <div class="flex" style="gap: 16px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Finanzamt</label>
+                            <input type="text" name="finanzamt" value="${settings.finanzamt}">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Länderschlüssel</label>
+                            <input type="text" name="laenderschlüssel" value="${settings.laenderschlüssel}">
+                        </div>
+                    </div>
+                    
+                    <h3 class="mb-4 mt-4" style="font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">Bankverbindung</h3>
+                    <div class="flex" style="gap: 16px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Bankname</label>
+                            <input type="text" name="bank_name" value="${settings.bank_name}">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Kontoinhaber</label>
+                            <input type="text" name="kontoinhaber" value="${settings.kontoinhaber}">
+                        </div>
+                    </div>
+                    <div class="flex" style="gap: 16px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>IBAN</label>
+                            <input type="text" name="iban" value="${settings.iban}">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>BIC</label>
+                            <input type="text" name="bic" value="${settings.bic}">
+                        </div>
+                    </div>
+
+                    <h3 class="mb-4 mt-4" style="font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">Standardtexte</h3>
+                    <div class="form-group">
+                        <label>Pflichtenhinweis (§14b UStG)</label>
+                        <input type="text" name="pflichtenhinweis" value="${settings.pflichtenhinweis}">
                     </div>
                     <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" value="${settings.email}">
+                        <label>Freistellungstext</label>
+                        <input type="text" name="freistellungstext" value="${settings.freistellungstext}">
                     </div>
                     <div class="form-group">
-                        <label>Bank</label>
-                        <input type="text" name="bank" value="${settings.bank}">
+                        <label>Zusatzhinweis Bank (Hervorgehoben)</label>
+                        <input type="text" name="zahlungszusatz" value="${settings.zahlungszusatz}">
                     </div>
-                    <div class="form-group">
-                        <label>IBAN</label>
-                        <input type="text" name="iban" value="${settings.iban}">
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Konfiguration speichern</button>
+                        <button type="button" class="btn" style="background: rgba(255,0,0,0.1); color: #ff5555; margin-left: 10px;" onclick="app.resetData()">Werkseinstellungen</button>
                     </div>
-                    <div class="form-group">
-                        <label>MwSt. Standard (%)</label>
-                        <input type="number" name="mwst_satz" value="${settings.mwst_satz}">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Speichern</button>
-                    <button type="button" class="btn" style="background: rgba(255,0,0,0.1); color: #ff5555; margin-left: 10px;" onclick="app.resetData()">Daten zurücksetzen</button>
                 </form>
             </div>
         `;
