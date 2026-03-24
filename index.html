@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rechnungsmanager - GHS Heizung</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="src/index.css">
+</head>
+<body>
+
+<div id="app">
+    <!-- Sidebar (Static Shell) -->
+    <aside id="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-file-invoice-dollar"></i> RECHNUNGS<span style="color:#fff">MANAGER</span>
+        </div>
+        
+        <nav id="menu">
+            <a href="#dashboard" class="nav-link active" data-page="dashboard">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
+            <a href="#rechnungen" class="nav-link" data-page="rechnungen">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Rechnungen
+            </a>
+            <a href="#kunden" class="nav-link" data-page="kunden">
+                <i class="fa-solid fa-users"></i> Stammkunden
+            </a>
+            <a href="#einstellungen" class="nav-link" data-page="einstellungen">
+                <i class="fa-solid fa-sliders"></i> Einstellungen
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            v1.1.0 | GHS Heizung
+        </div>
+    </aside>
+
+    <!-- Main Content (Dynamic) -->
+    <main id="content">
+        <div id="loader" class="loader-container">
+            <div class="spinner"></div>
+        </div>
+        <div id="page-container">
+            <!-- Content will be injected here -->
+        </div>
+    </main>
+</div>
+
+<!-- Modal Container -->
+<div id="modal-container"></div>
+
+<!-- App Logic -->
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
