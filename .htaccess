@@ -1,0 +1,40 @@
+# GHS Heizung - Invoice Manager
+# Apache Configuration for standard webservers
+
+# 1. Basic Security
+Options -Indexes
+ServerSignature Off
+
+# 2. Prevent access to configuration and hidden files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# 3. Cache Control
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+    
+    # Static Assets (Images, Icons, Webfonts)
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    
+    # CSS & JavaScript
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+</IfModule>
+
+# 4. SPA Routing (Optional - current app uses Hash routing)
+# If you want to use clean URLs instead of #, uncomment these lines:
+# <IfModule mod_rewrite.c>
+#    RewriteEngine On
+#    RewriteBase /
+#    RewriteRule ^index\.html$ - [L]
+#    RewriteCond %{REQUEST_FILENAME} !-f
+#    RewriteCond %{REQUEST_FILENAME} !-d
+#    RewriteRule . /index.html [L]
+# </IfModule>
+
+# 5. Charset
+AddDefaultCharset UTF-8

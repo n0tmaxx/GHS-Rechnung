@@ -3,60 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rechnungsmanager - GHS Heizung</title>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
+    <title>GHS Rechnungsmanagement</title>
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Main Styles -->
+    <!-- Main Design System -->
     <link rel="stylesheet" href="src/index.css">
 </head>
 <body>
 
-<div id="app">
-    <!-- Sidebar (Static Shell) -->
+    <!-- Sidebar Navigation (Desktop) / Tab-Bar (Mobile) -->
     <aside id="sidebar">
-        <div class="logo">
-            <i class="fa-solid fa-file-invoice-dollar"></i> RECHNUNGS<span style="color:#fff">MANAGER</span>
+        <div class="logo-area">
+            <div class="logo-text">GHS <span>MANAGER</span></div>
+            <div style="font-size: 9px; color: var(--text-muted); margin-top: 4px; opacity: 0.6;">Heizung & Sanitär v1.0</div>
         </div>
         
-        <nav id="menu">
-            <a href="#dashboard" class="nav-link active" data-page="dashboard">
+        <nav id="main-nav">
+            <a href="#dashboard" class="nav-item active" data-view="dashboard">
                 <i class="fa-solid fa-chart-line"></i> Dashboard
             </a>
-            <a href="#rechnungen" class="nav-link" data-page="rechnungen">
-                <i class="fa-solid fa-file-invoice-dollar"></i> Rechnungen
+            <a href="#rechnung-neu" class="nav-item" data-view="rechnungen">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Neue Rechnung
             </a>
-            <a href="#kunden" class="nav-link" data-page="kunden">
-                <i class="fa-solid fa-users"></i> Stammkunden
+            <a href="#rechnungen" class="nav-item" data-view="rechnungsliste">
+                <i class="fa-solid fa-list-check"></i> Alle Belege
             </a>
-            <a href="#einstellungen" class="nav-link" data-page="einstellungen">
-                <i class="fa-solid fa-sliders"></i> Einstellungen
+            <a href="#kunden" class="nav-item" data-view="kunden">
+                <i class="fa-solid fa-user-group"></i> Stammkunden
+            </a>
+            <a href="#einstellungen" class="nav-item" data-view="settings">
+                <i class="fa-solid fa-gears"></i> Einstellungen
             </a>
         </nav>
         
         <div class="sidebar-footer">
-            v1.1.0 | GHS Heizung
+            &copy; 2026 GHS Heizung & Sanitär<br>
+            Design by Antigravity
         </div>
     </aside>
 
-    <!-- Main Content (Dynamic) -->
-    <main id="content">
-        <div id="loader" class="loader-container">
-            <div class="spinner"></div>
-        </div>
-        <div id="page-container">
-            <!-- Content will be injected here -->
+    <!-- Main Content Area -->
+    <main id="content-area">
+        <div class="container" id="view-container">
+            <!-- Dynamic Content Injected by app.js -->
+            <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <div class="spinner"></div> 
+            </div>
         </div>
     </main>
-</div>
 
-<!-- Modal Container -->
-<div id="modal-container"></div>
-
-<!-- App Logic -->
-<script type="module" src="src/app.js"></script>
+    <!-- App Logic Injection -->
+    <script type="module" src="src/app.js"></script>
 </body>
 </html>
